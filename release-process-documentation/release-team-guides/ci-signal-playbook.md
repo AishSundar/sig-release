@@ -1,6 +1,19 @@
 # CI Signal Lead Playbook
 
-Explicit detail is important:
+## Overview of CI Signal responsibilities
+CI Signal lead assumes the responsibility of the quality gate for the release. This person is responsible for:
+- Monitors various e2e tests in sig-release dashboard ([master-blocking](https://k8s-testgrid.appspot.com/sig-release-master-blocking), [master-upgrade](https://k8s-testgrid.appspot.com/sig-release-master-upgrade), [x.y-blocking](https://k8s-testgrid.appspot.com/sig-release-1.11-blocking))on a regular basis and provides early and continuous signals on release and test health to both the Release team and SIGs
+- Ensures that all release blocking tests provide a clear Go/No-Go signal for the release
+- Flags regression as close to source as possible i.e., as soon as the offending code was merged
+- Files and triages issues proactively for test failures and flakes, finds appropriate SIG/owner, follows up on status and verifies fixes on newer test runs
+- Studies patterns/history of test health from previous releases and works closely with SIGs and test owners to 
+  - Understand and fix the test for the current release
+  - Understand if the test needs to be release blocking
+  - Advise Release team in making informed go/no-go calls 
+  - Work with sig-testing on any possible test infra improvement to help improve test pass rate
+- Makesrecommendations to Sig-Release for promoting and demoting Release blocking and Merge blocking tests as per the [Blocking tests Proposal](https://docs.google.com/document/d/1kCDdmlpTnHPQt5z8JzODdFCc3T2D4MKR53twsDZu20c/edit)
+
+### Explicit detail is important:
 - If you're looking for answer that's not in this document, don't just ask me, please file an issue so we can keep the document current.
 - If I don't file an issue for a failing job or test, _I will lose track of it_, so I err on the side of filing an issue even if someone told me something in some other medium
 - If a dashboard isn't listed here, or a test isn't on one of the listed dashboards, **_I'm not looking at it_**
