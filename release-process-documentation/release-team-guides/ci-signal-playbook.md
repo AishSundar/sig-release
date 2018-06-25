@@ -11,7 +11,7 @@ CI Signal lead assumes the responsibility of the quality gate for the release. T
   - Understand if the test needs to be release blocking
   - Advise Release team in making informed go/no-go calls 
   - Work with sig-testing on any possible test infra improvement to help improve test pass rate
-- Makesrecommendations to Sig-Release for promoting and demoting Release blocking and Merge blocking tests as per the [Blocking tests Proposal](https://docs.google.com/document/d/1kCDdmlpTnHPQt5z8JzODdFCc3T2D4MKR53twsDZu20c/edit)
+- Makes recommendations to Sig-Release for promoting and demoting Release blocking and Merge blocking tests as per the [Blocking tests Proposal](https://docs.google.com/document/d/1kCDdmlpTnHPQt5z8JzODdFCc3T2D4MKR53twsDZu20c/edit)
 
 ### Explicit detail is important:
 - If you're looking for answer that's not in this document, don't just ask me, please file an issue so we can keep the document current.
@@ -27,28 +27,47 @@ CI Signal lead assumes the responsibility of the quality gate for the release. T
   - I can ask previous CI Signal leads for advice
   - I can ask sig-testing for guidance
 
-## Status Quo
+## Overview of tasks across release timeline
 
-Currently, here's what I'm doing as the CI Signal role for release 1.y:
+For any release, its schedule and activities/deliverable for each week will be published in the release directory, e.g: [1.11 schedule](https://github.com/kubernetes/sig-release/blob/master/releases/release-1.11/release-1.11.md#timeline). This section talks about specific CI Signal lead deliverable for each milestone in the release cycle.
 
-### Checking test dashboards
+### Pre Feature Freeze
+Here are some good early deliverables from the CI Signal lead between start of release and feature freeze
+- Maintain a master tracking sheet and keep it up-to-date with  issues tracking any test issue (failure/flake) - [Sample sheet](https://docs.google.com/spreadsheets/d/1j2K8cxraSp8jZR2S-kJUT6GNjtXYU9hocNRiVUGZWvc/edit#gid=127492362)
+- Copy over any open test issues from previous release (ask previous CI Signal lead for the tracker sheet) and follow up on them with owners
+- Monitor [master-blocking](https://k8s-testgrid.appspot.com/sig-release-master-blocking) and [master-upgrade](https://k8s-testgrid.appspot.com/sig-release-master-upgrade) dashboards **twice a week** and ensure all failures and flakes have issues open
+  - Make sure all open issues have a kind/bug, priority/flake or priority/failing-test, priority/important-soon labels 
+  - Make sure the issue is assigned against the current milestone 1.xx, using /milestone
+  - Assign the issue to appropriate SIG using /sig label
+  - Add @kubernetes/sig-foo-test-failures to get SIG’s attention on the issue
+  - CC the release manager and bug triage lead
+  - Draw SIG's attention to the test failure by post in SIG’s Slack channel. This can also help routing the issue to the rightful owner(s) in the SIG
+  - [Sample test failure issue](https://github.com/kubernetes/kubernetes/issues/63611)
+- Build and maintain a document of area experts / owners across SIGs for future needs eg: Scalability experts, upgrade test experts etc
+  
+#### **_Best Practice:_** 
+The SLA and involvement of signal lead at this stage might vary from release to release (and the CI Signal lead). However in an effort to establish a baseline of the test health, the signal lead can take an initial stab at the tests runs at the start of the release, open issues, gather and report on the current status. Post that, it might suffice to check on the tests **twice a week** due to high code churn and expected test instability.
 
-I check [sig-release-master-blocking](https://k8s-testgrid.appspot.com/sig-release-master-blocking) daily.
+### Feature Freeze to Code Freeze
+Day to day tasks remain pretty much the same as before, with the following slight changes
+- Post 1.xx.0-beta.0 release, [master-blocking](https://k8s-testgrid.appspot.com/sig-release-master-blocking) and [master-upgrade](https://k8s-testgrid.appspot.com/sig-release-master-upgrade) dashboards **every other day**.
+- Starting now, curate and send a **Weekly CI Signal report** escalating current test failures and flakes to the entire kubernetes-dev community. Such conitnuous and early reporting of test health went a long way in rallying SIG attention to test failures and stabilizing the release much early in the release cycle.
+  - 
 
-- quirk: if a job is listed as FAILING but doesn't have "Overall" as one of its ongoing failures, it's not actually failing
-- if a job is failing in one of the meta-stages (Up, Down, DumpClusterLogs, etc), I find the owning sig
-- if a job is failing because a specific test case is failing, and that test case has a [sig-foo] in its name, I go bug sig-foo
-- with unit test case failures, I try to infer the sig from the path, or OWNERS files in it, otherwise I find the owning sig to help
-- with verify failures, I try to infer the failure from the log, otherwise I find the owning sig to help
+### Tips and Tricks when checking test dashboards
+
+- Quirk: if a job is listed as FAILING but doesn't have "Overall" as one of its ongoing failures, it's not actually failing. It might be "red" from some previous test runs failures and will clear up after a few "green" runs
+- if a job is failing in one of the meta-stages (Up, Down, DumpClusterLogs, etc), find the owning SIG since it is a infra failure
+- if a job is failing because a specific test case is failing, and that test case has a [sig-foo] in its name, tag sig-foo in the issue and find appropriate owner within the sig
+- with unit test case failures, try to infer the SIG from the path or OWNERS files in it. Otherwise find the owning SIG to help
+- with verify failures, try to infer the failure from the log. Otherwise find the owning SIG to help
 - if a test case is failing in one job consistently, but not others, both the job owner and test case owner are responsible for identifying why this combination is different
 
-I will ocasionally check [sig-release-master-upgrade](https://k8s-testgrid.appspot.com/sig-release-master-upgrade)
+### Routing test issues to SIG/owner
 
-### Pinging SIG's
+This can be done in 2 ways (i) including @kubernetes/sig-foo-test-failures teams in the issue files and (ii) going to the #sig-foo slack channel if you need help routing the failue to appropriate owner.
 
-I do this by using @kubernetes/sig-foo-test-failures teams when I file issues, or going to the #sig-foo slack channel if I need routing help and know someone's around
-
-If a job as a whole is failing, I file a v1.y issue in kubernetes/kubernetes titled:`[job failure] job name issue`
+If a job as a whole is failing, file a v1.y issue in kubernetes/kubernetes titled:`[job failure] job name issue`
 ```
 /priority critical-urgent
 /priority failing-test
@@ -64,7 +83,7 @@ https://k8s-testgrid.appspot.com/sig-sig-release-master-blocking#[THE FAILING JO
 Examples:
 - [[job failure] ci-kubernetes-e2e-kubeadm-gce](https://github.com/kubernetes/kubernetes/issues/54905)
 
-If a test case is failing, I file a v1.y milestone issue in kubernetes/kubernetes titled: `[e2e failure] full test case name`
+If a test case is failing, file a v1.y milestone issue in kubernetes/kubernetes titled: `[e2e failure] full test case name`
 ```
 /priority critical-urgent
 /priority failing-test
